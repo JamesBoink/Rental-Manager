@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>RentalManager.Domain</RootNamespace>
+  </PropertyGroup>
+
+</Project>
