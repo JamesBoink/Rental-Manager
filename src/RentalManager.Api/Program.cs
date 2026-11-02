@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.OpenApi.Models;
 using RentalManager.Infrastructure;
+using RentalManager.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,12 @@ if (swaggerEnabled)
 }
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    await initializer.MigrateAsync();
+}
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();

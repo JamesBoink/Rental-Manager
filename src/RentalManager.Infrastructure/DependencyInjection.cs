@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddDbContext<RentalDbContext>(options =>
             options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));
 
+        services.AddScoped<DatabaseInitializer>();
+
         return services;
     }
 }
