@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RentalManager.Api.Controllers;
@@ -14,6 +15,15 @@ public class SystemController(IWebHostEnvironment environment) : ControllerBase
 
         return Ok(new SystemInfoResponse("RentalManager.Api", version, environment.EnvironmentName, DateTime.UtcNow));
     }
+
+    [HttpGet("diagnostics")]
+    [Authorize(Policy = "ManagerOrAdmin")]
+    public ActionResult<DiagnosticsResponse> GetDiagnostics()
+    {
+        return Ok(new DiagnosticsResponse(Environment.MachineName, DateTime.UtcNow));
+    }
 }
 
 public record SystemInfoResponse(string Service, string Version, string Environment, DateTime UtcNow);
+
+public record DiagnosticsResponse(string Machine, DateTime UtcNow);

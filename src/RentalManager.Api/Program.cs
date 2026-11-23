@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.OpenApi.Models;
+using RentalManager.Api.Extensions;
 using RentalManager.Infrastructure;
 using RentalManager.Infrastructure.Persistence;
 
@@ -12,6 +13,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiAuthentication(builder.Configuration);
 
 if (swaggerEnabled)
 {
@@ -63,7 +65,12 @@ if (swaggerEnabled)
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+public partial class Program;
