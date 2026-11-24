@@ -51,6 +51,17 @@ public class EquipmentItem
 
     public ICollection<ReservationLine> ReservationLines { get; private set; } = new List<ReservationLine>();
 
+    public void Rename(string name, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new DomainException("Equipment name is required.");
+        }
+
+        Name = name.Trim();
+        Description = description?.Trim();
+    }
+
     public void ChangeStatus(EquipmentStatus status)
     {
         if (Status == EquipmentStatus.Rented && status == EquipmentStatus.Retired)

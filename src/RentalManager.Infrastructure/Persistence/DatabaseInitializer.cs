@@ -17,7 +17,10 @@ public class DatabaseInitializer(
 {
     public async Task MigrateAsync(CancellationToken cancellationToken = default)
     {
-        await db.Database.MigrateAsync(cancellationToken);
+        if (db.Database.IsRelational())
+        {
+            await db.Database.MigrateAsync(cancellationToken);
+        }
 
         SeedData.Apply(db);
         SeedAdminUser();

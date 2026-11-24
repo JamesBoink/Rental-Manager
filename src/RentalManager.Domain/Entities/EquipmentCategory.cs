@@ -26,4 +26,15 @@ public class EquipmentCategory
     public string? Description { get; private set; }
 
     public ICollection<EquipmentItem> Equipment { get; private set; } = new List<EquipmentItem>();
+
+    public void Rename(string name, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new DomainException("Category name is required.");
+        }
+
+        Name = name.Trim();
+        Description = description?.Trim();
+    }
 }

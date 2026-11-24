@@ -47,6 +47,13 @@ public class Customer
 
     public ICollection<Reservation> Reservations { get; private set; } = new List<Reservation>();
 
+    public void SetContactDetails(string? phone, string? taxId, string? address)
+    {
+        Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
+        TaxId = string.IsNullOrWhiteSpace(taxId) ? null : taxId.Trim();
+        Address = string.IsNullOrWhiteSpace(address) ? null : address.Trim();
+    }
+
     public void UpdateDetails(string name, string email, string? phone, string? taxId, string? address)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -61,9 +68,7 @@ public class Customer
 
         Name = name.Trim();
         Email = email.Trim().ToLowerInvariant();
-        Phone = phone;
-        TaxId = taxId;
-        Address = address;
+        SetContactDetails(phone, taxId, address);
     }
 
     public void Deactivate()

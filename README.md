@@ -6,8 +6,9 @@ availability checks, pricing and monthly reporting.
 Written as a portfolio project to work with ASP.NET Core the way I would on a
 normal business application — layered, tested, containerised, no framework tricks.
 
-**Status:** work in progress. The domain model, database layer and authentication
-are in place. Catalogue and reservation endpoints land in the next commits.
+**Status:** work in progress. The domain model, database layer, authentication
+and the catalogue/customer endpoints are in place. Reservations and reporting
+land in the next commits.
 
 ## Stack
 
@@ -54,6 +55,31 @@ Roles are `Staff`, `Manager` and `Admin`. `/api/auth/me` needs a valid token;
 `/api/system/diagnostics` is restricted to Manager and Admin by the
 `ManagerOrAdmin` policy. `/health` and `/api/system/info` stay public.
 
+## Endpoints
+
+All catalogue and customer routes require a token. Reads are available to every
+authenticated role; writes need Manager or Admin.
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| GET | `/api/categories?page&pageSize` | paged category list |
+| GET | `/api/categories/{id}` | single category |
+| POST | `/api/categories` | create category |
+| PUT | `/api/categories/{id}` | rename category |
+| GET | `/api/equipment?page&pageSize&categoryId&status&search` | paged equipment list |
+| GET | `/api/equipment/{id}` | single item |
+| POST | `/api/equipment` | add item |
+| PUT | `/api/equipment/{id}` | rename item / change daily rate |
+| PATCH | `/api/equipment/{id}/status` | change availability status |
+| GET | `/api/customers?page&pageSize&activeOnly&search` | paged customer list |
+| GET | `/api/customers/{id}` | single customer |
+| POST | `/api/customers` | create customer |
+| PUT | `/api/customers/{id}` | update customer details |
+| POST | `/api/customers/{id}/deactivate` | deactivate customer |
+
+Validation failures return a 400 Validation Problem Details body; duplicate
+category names and customer emails return 409.
+
 ## Database
 
 Migrations live in `src/RentalManager.Infrastructure/Persistence/Migrations` and
@@ -71,10 +97,10 @@ dotnet ef database update --project src/RentalManager.Infrastructure
 dotnet test
 ```
 
-The tests in `tests/RentalManager.Tests/Infrastructure` run against a real
-MySQL database — `rental_manager_test` by default, on localhost:3306. They drop
-and recreate that schema, so point them at a scratch instance. API integration
-tests use `rental_manager_api_test` on the same server.
+The suite is self-contained. API integration tests run through
+`WebApplicationFactory` with an EF Core in-memory provider, so no MySQL server
+or test schema is needed. Domain rules, password hashing and JWT generation are
+covered by unit tests.
 
 ## Layout
 
@@ -92,7 +118,7 @@ tests/
 
 - [x] Domain model and EF Core mappings
 - [x] Authentication and roles
-- [ ] Catalogue and customer endpoints
+- [x] Catalogue and customer endpoints
 - [ ] Reservations, availability and pricing
 - [ ] Overdue handling and reporting
 - [ ] Docker, CI
