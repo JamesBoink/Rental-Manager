@@ -15,6 +15,7 @@ public class EquipmentItemConfiguration : IEntityTypeConfiguration<EquipmentItem
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(1000);
         builder.Property(x => x.DailyRate).HasPrecision(10, 2);
+        builder.Property(x => x.Stock).IsRequired();
         builder.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
 
         builder.HasOne(x => x.Category)

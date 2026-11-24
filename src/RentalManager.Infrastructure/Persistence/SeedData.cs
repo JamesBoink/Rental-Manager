@@ -49,10 +49,10 @@ internal static class SeedData
 
         db.EquipmentItems.AddRange(
             new EquipmentItem(categories["Power tools"], "Cordless impact wrench", 85.00m, "18V, 1/2 inch drive"),
-            new EquipmentItem(categories["Power tools"], "Rotary hammer", 95.00m, "SDS-plus, 800W"),
-            new EquipmentItem(categories["Power tools"], "Angle grinder 125mm", 45.00m),
+            new EquipmentItem(categories["Power tools"], "Rotary hammer", 95.00m, "SDS-plus, 800W", 3),
+            new EquipmentItem(categories["Power tools"], "Angle grinder 125mm", 45.00m, null, 2),
             new EquipmentItem(categories["Scaffolding"], "Tower scaffold 2x2m", 120.00m, "Aluminium, 4.2m working height"),
-            new EquipmentItem(categories["Scaffolding"], "Steel prop 2m", 6.50m),
+            new EquipmentItem(categories["Scaffolding"], "Steel prop 2m", 6.50m, null, 20),
             new EquipmentItem(categories["Site equipment"], "Plate compactor", 160.00m, "500kg, reversible"),
             new EquipmentItem(categories["Site equipment"], "Petrol generator 5kVA", 210.00m, "230V, 10A outlet"));
     }

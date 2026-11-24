@@ -124,6 +124,7 @@ public sealed class CatalogueService(RentalDbContext db) : ICatalogueService
                 x.CategoryId,
                 x.Category.Name,
                 x.DailyRate,
+                x.Stock,
                 x.Status.ToString()))
             .ToListAsync(cancellationToken);
 
@@ -206,6 +207,7 @@ public sealed class CatalogueService(RentalDbContext db) : ICatalogueService
             item.CategoryId,
             item.Category.Name,
             item.DailyRate,
+            item.Stock,
             item.Status.ToString());
 
     private static int NormalizePage(int page) => page < 1 ? 1 : page;

@@ -6,9 +6,9 @@ availability checks, pricing and monthly reporting.
 Written as a portfolio project to work with ASP.NET Core the way I would on a
 normal business application — layered, tested, containerised, no framework tricks.
 
-**Status:** work in progress. The domain model, database layer, authentication
-and the catalogue/customer endpoints are in place. Reservations and reporting
-land in the next commits.
+**Status:** work in progress. The domain model, database layer, authentication,
+catalogue/customer endpoints and reservations with availability are in place.
+Reporting and deployment land in the next commits.
 
 ## Stack
 
@@ -57,8 +57,9 @@ Roles are `Staff`, `Manager` and `Admin`. `/api/auth/me` needs a valid token;
 
 ## Endpoints
 
-All catalogue and customer routes require a token. Reads are available to every
-authenticated role; writes need Manager or Admin.
+All routes below require a token. Catalogue and customer reads are available to
+every authenticated role; catalogue/customer writes need Manager or Admin. Any
+authenticated role can manage reservations.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -76,9 +77,30 @@ authenticated role; writes need Manager or Admin.
 | POST | `/api/customers` | create customer |
 | PUT | `/api/customers/{id}` | update customer details |
 | POST | `/api/customers/{id}/deactivate` | deactivate customer |
+| GET | `/api/reservations?page&pageSize&status&customerId&from&to` | paged reservation list |
+| GET | `/api/reservations/availability?from&to` | stock and booked units per item |
+| GET | `/api/reservations/{id}` | single reservation |
+| POST | `/api/reservations` | create draft with lines |
+| POST | `/api/reservations/{id}/lines` | add a line to a draft |
+| POST | `/api/reservations/{id}/confirm` | draft → confirmed |
+| POST | `/api/reservations/{id}/start` | confirmed → active |
+| POST | `/api/reservations/{id}/complete` | active → completed |
+| POST | `/api/reservations/{id}/cancel` | cancel a non-finished reservation |
 
 Validation failures return a 400 Validation Problem Details body; duplicate
-category names and customer emails return 409.
+category names, customer emails and unavailable equipment return 409.
+
+## Reservations
+
+A reservation starts as a draft, holds one or more equipment lines and computes
+its total from `unit price × days × quantity` at the time the line is added.
+Equipment has a `Stock` count; only confirmed and active lines count as booked,
+and periods are half-open, so a booking ending on the 4th does not collide with
+one starting on the 4th.
+
+Availability is checked when a line is written. It is a service-level check,
+not a database exclusion constraint, so it does not replace locking under heavy
+concurrent writes.
 
 ## Database
 
@@ -119,6 +141,6 @@ tests/
 - [x] Domain model and EF Core mappings
 - [x] Authentication and roles
 - [x] Catalogue and customer endpoints
-- [ ] Reservations, availability and pricing
+- [x] Reservations, availability and pricing
 - [ ] Overdue handling and reporting
 - [ ] Docker, CI

@@ -15,6 +15,7 @@ public sealed record EquipmentDto(
     int CategoryId,
     string CategoryName,
     decimal DailyRate,
+    int Stock,
     string Status);
 
 public sealed record CreateEquipmentRequest(

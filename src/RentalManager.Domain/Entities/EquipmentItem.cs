@@ -16,7 +16,12 @@ public class EquipmentItem
     {
     }
 
-    public EquipmentItem(EquipmentCategory category, string name, decimal dailyRate, string? description = null)
+    public EquipmentItem(
+        EquipmentCategory category,
+        string name,
+        decimal dailyRate,
+        string? description = null,
+        int stock = 1)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -28,10 +33,16 @@ public class EquipmentItem
             throw new DomainException("Daily rate cannot be negative.");
         }
 
+        if (stock < 1)
+        {
+            throw new DomainException("Stock must be at least one.");
+        }
+
         Category = category;
         Name = name.Trim();
         DailyRate = dailyRate;
         Description = description?.Trim();
+        Stock = stock;
         Status = EquipmentStatus.Available;
     }
 
@@ -47,6 +58,8 @@ public class EquipmentItem
 
     public decimal DailyRate { get; private set; }
 
+    public int Stock { get; private set; }
+
     public EquipmentStatus Status { get; private set; }
 
     public ICollection<ReservationLine> ReservationLines { get; private set; } = new List<ReservationLine>();
@@ -60,6 +73,16 @@ public class EquipmentItem
 
         Name = name.Trim();
         Description = description?.Trim();
+    }
+
+    public void ChangeStock(int stock)
+    {
+        if (stock < 1)
+        {
+            throw new DomainException("Stock must be at least one.");
+        }
+
+        Stock = stock;
     }
 
     public void ChangeStatus(EquipmentStatus status)
