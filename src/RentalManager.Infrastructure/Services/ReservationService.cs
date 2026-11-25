@@ -156,7 +156,8 @@ public sealed class ReservationService(RentalDbContext db) : IReservationService
 
         var booked = await db.ReservationLines
             .Where(x => (x.Reservation.Status == ReservationStatus.Confirmed ||
-                         x.Reservation.Status == ReservationStatus.Active) &&
+                         x.Reservation.Status == ReservationStatus.Active ||
+                         x.Reservation.Status == ReservationStatus.Overdue) &&
                         x.From < to && from < x.To)
             .GroupBy(x => x.EquipmentId)
             .Select(x => new { EquipmentId = x.Key, Quantity = x.Sum(y => y.Quantity) })
@@ -178,6 +179,26 @@ public sealed class ReservationService(RentalDbContext db) : IReservationService
             .ToList();
 
         return new AvailabilityResultDto(from, to, items);
+    }
+
+    public async Task<int> MarkOverdueAsync(
+        DateTime now, CancellationToken cancellationToken = default)
+    {
+        var overdue = await db.Reservations
+            .Where(x => x.Status == ReservationStatus.Active && x.To < now)
+            .ToListAsync(cancellationToken);
+
+        foreach (var reservation in overdue)
+        {
+            reservation.MarkOverdue();
+        }
+
+        if (overdue.Count > 0)
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        return overdue.Count;
     }
 
     private async Task<ReservationDto?> ChangeStatusAsync(
@@ -235,7 +256,8 @@ public sealed class ReservationService(RentalDbContext db) : IReservationService
         var booked = await db.ReservationLines
             .Where(x => x.EquipmentId == equipmentId &&
                         (x.Reservation.Status == ReservationStatus.Confirmed ||
-                         x.Reservation.Status == ReservationStatus.Active) &&
+                         x.Reservation.Status == ReservationStatus.Active ||
+                         x.Reservation.Status == ReservationStatus.Overdue) &&
                         x.From < to && from < x.To)
             .SumAsync(x => (int?)x.Quantity, cancellationToken) ?? 0;
 

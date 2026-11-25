@@ -31,4 +31,6 @@ public interface IReservationService
 
     Task<AvailabilityResultDto> CheckAvailabilityAsync(
         DateTime from, DateTime to, CancellationToken cancellationToken = default);
+
+    Task<int> MarkOverdueAsync(DateTime now, CancellationToken cancellationToken = default);
 }

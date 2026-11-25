@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<ICatalogueService, CatalogueService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IReservationService, ReservationService>();
+        services.AddScoped<IReportService, ReportService>();
         services.AddScoped<DatabaseInitializer>();
 
         return services;

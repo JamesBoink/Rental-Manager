@@ -49,3 +49,5 @@ public sealed record AvailabilityResultDto(
     DateTime From,
     DateTime To,
     IReadOnlyList<EquipmentAvailabilityDto> Items);
+
+public sealed record OverdueSweepDto(int Marked);

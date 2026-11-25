@@ -129,6 +129,37 @@ public class ReservationTests
         Assert.Throws<DomainException>(() => reservation.Cancel());
     }
 
+    [Fact]
+    public void OnlyActiveReservationsCanBecomeOverdue()
+    {
+        var reservation = new Reservation(CreateCustomer(), "R-2026-001", From, To);
+        reservation.AddLine(CreateEquipment(), From, To);
+
+        Assert.Throws<DomainException>(() => reservation.MarkOverdue());
+
+        reservation.Confirm();
+        reservation.Start();
+        reservation.MarkOverdue();
+
+        Assert.Equal(ReservationStatus.Overdue, reservation.Status);
+        Assert.Throws<DomainException>(() => reservation.MarkOverdue());
+        Assert.Throws<DomainException>(() => reservation.Start());
+    }
+
+    [Fact]
+    public void OverdueReservationCanBeCompleted()
+    {
+        var reservation = new Reservation(CreateCustomer(), "R-2026-001", From, To);
+        reservation.AddLine(CreateEquipment(), From, To);
+        reservation.Confirm();
+        reservation.Start();
+        reservation.MarkOverdue();
+
+        reservation.Complete();
+
+        Assert.Equal(ReservationStatus.Completed, reservation.Status);
+    }
+
     [Theory]
     [InlineData(-1, 0, false)]
     [InlineData(-1, 1, true)]

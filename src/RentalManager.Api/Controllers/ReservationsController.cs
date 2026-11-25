@@ -50,6 +50,17 @@ public sealed class ReservationsController(
         return Ok(await service.CheckAvailabilityAsync(from, to, cancellationToken));
     }
 
+    [HttpPost("mark-overdue")]
+    [Authorize(Policy = "ManagerOrAdmin")]
+    [ProducesResponseType(typeof(OverdueSweepDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<OverdueSweepDto>> MarkOverdue(
+        [FromQuery] DateTime? now = null, CancellationToken cancellationToken = default)
+    {
+        var marked = await service.MarkOverdueAsync(now ?? DateTime.UtcNow, cancellationToken);
+
+        return Ok(new OverdueSweepDto(marked));
+    }
+
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

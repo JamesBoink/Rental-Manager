@@ -8,7 +8,8 @@ public enum ReservationStatus
     Confirmed = 1,
     Active = 2,
     Completed = 3,
-    Cancelled = 4
+    Cancelled = 4,
+    Overdue = 5
 }
 
 public class Reservation
@@ -109,12 +110,22 @@ public class Reservation
 
     public void Complete()
     {
-        if (Status != ReservationStatus.Active)
+        if (Status is not (ReservationStatus.Active or ReservationStatus.Overdue))
         {
-            throw new DomainException("Only an active reservation can be completed.");
+            throw new DomainException("Only an active or overdue reservation can be completed.");
         }
 
         Status = ReservationStatus.Completed;
+    }
+
+    public void MarkOverdue()
+    {
+        if (Status != ReservationStatus.Active)
+        {
+            throw new DomainException("Only an active reservation can become overdue.");
+        }
+
+        Status = ReservationStatus.Overdue;
     }
 
     public void Cancel()

@@ -7,8 +7,8 @@ Written as a portfolio project to work with ASP.NET Core the way I would on a
 normal business application — layered, tested, containerised, no framework tricks.
 
 **Status:** work in progress. The domain model, database layer, authentication,
-catalogue/customer endpoints and reservations with availability are in place.
-Reporting and deployment land in the next commits.
+catalogue/customer endpoints, reservations with availability, overdue handling
+and monthly reporting are in place. Deployment lands in the next commits.
 
 ## Stack
 
@@ -57,9 +57,10 @@ Roles are `Staff`, `Manager` and `Admin`. `/api/auth/me` needs a valid token;
 
 ## Endpoints
 
-All routes below require a token. Catalogue and customer reads are available to
-every authenticated role; catalogue/customer writes need Manager or Admin. Any
-authenticated role can manage reservations.
+All routes below require a token. Catalogue, customer, reservation and report
+reads are available to every authenticated role; catalogue/customer writes and
+the overdue sweep need Manager or Admin. Any authenticated role can manage
+reservations.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -86,6 +87,8 @@ authenticated role can manage reservations.
 | POST | `/api/reservations/{id}/start` | confirmed → active |
 | POST | `/api/reservations/{id}/complete` | active → completed |
 | POST | `/api/reservations/{id}/cancel` | cancel a non-finished reservation |
+| POST | `/api/reservations/mark-overdue?now` | mark expired active reservations overdue (Manager/Admin) |
+| GET | `/api/reports/monthly?year&month&asOf` | monthly revenue, rental days and overdue bookings |
 
 Validation failures return a 400 Validation Problem Details body; duplicate
 category names, customer emails and unavailable equipment return 409.
@@ -101,6 +104,19 @@ one starting on the 4th.
 Availability is checked when a line is written. It is a service-level check,
 not a database exclusion constraint, so it does not replace locking under heavy
 concurrent writes.
+
+## Overdue and reporting
+
+An active reservation past its end date is marked `Overdue` by the
+`mark-overdue` endpoint. The sweep is idempotent and takes an optional `now`
+value so it can be tested without waiting for a clock; overdue equipment still
+counts as booked, but an overdue reservation can be completed or cancelled.
+
+The monthly report includes reservations whose end date falls in the requested
+month, excluding drafts and cancellations. Revenue is the sum of captured line
+prices, grouped by equipment category, plus rental days (`days × quantity`) and
+a list of overdue bookings. `asOf` is optional and only affects the overdue day
+counts.
 
 ## Database
 
@@ -142,5 +158,5 @@ tests/
 - [x] Authentication and roles
 - [x] Catalogue and customer endpoints
 - [x] Reservations, availability and pricing
-- [ ] Overdue handling and reporting
-- [ ] Docker, CI
+- [x] Overdue handling and reporting
+- [ ] Docker, CI and deployment
